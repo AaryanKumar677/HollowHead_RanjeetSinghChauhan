@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

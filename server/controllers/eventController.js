@@ -11,7 +11,7 @@ export const createEvent = async (req, res) => {
     const {
       title, description, category, 
       latitude, longitude, geohash, addressString, 
-      date, price, totalCapacity 
+      date, price, totalCapacity, tags, image
     } = req.body;
 
     // Validate inputs based on provided schema
@@ -24,6 +24,8 @@ export const createEvent = async (req, res) => {
       description,
       organizerId: req.user.uid,
       category: category || 'Other',
+      tags: Array.isArray(tags) ? tags : [],
+      image: image || '',
       location: new admin.firestore.GeoPoint(parseFloat(latitude), parseFloat(longitude)),
       geohash,
       addressString,
