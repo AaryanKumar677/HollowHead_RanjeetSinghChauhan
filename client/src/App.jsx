@@ -13,6 +13,9 @@ import Booking from './pages/Booking';
 import Ticket from './pages/Ticket';
 import Dashboard from './pages/Dashboard';
 import CreateEvent from './pages/CreateEvent';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -24,14 +27,22 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/events/:id" element={<EventDetail />} />
-          <Route path="/book/:id" element={<Booking />} />
-          <Route path="/ticket/:id" element={<Ticket />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          
+          {/* Protected Client Routes */}
+          <Route element={<ProtectedRoute requiredRole="client" />}>
+            <Route path="/book/:id" element={<Booking />} />
+            <Route path="/ticket/:id" element={<Ticket />} />
+          </Route>
         </Route>
 
-        {/* Organizer Flow */}
-        <Route path="/organizer" element={<OrganizerLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="create" element={<CreateEvent />} />
+        {/* Organizer Flow (Protected) */}
+        <Route path="/organizer" element={<ProtectedRoute requiredRole="organizer" />}>
+          <Route element={<OrganizerLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="create" element={<CreateEvent />} />
+          </Route>
         </Route>
       </Routes>
     </div>
