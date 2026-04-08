@@ -1,15 +1,34 @@
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Settings, Home, LogOut } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, PlusCircle, Settings, Home, LogOut, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Sidebar.css';
 
 function Sidebar() {
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
         <NavLink to="/" className="sidebar-logo">
           <span className="logo-text">FlickyFest</span>
           <span className="logo-dot">.</span>
         </NavLink>
+        
+        {currentUser && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', background: 'var(--bg-subtle)', borderRadius: '12px', width: '100%', marginTop: '0.5rem' }}>
+            <img src={currentUser.avatar || "https://i.pravatar.cc/150"} alt="Avatar" style={{ width: '36px', height: '36px', borderRadius: '50%'}} />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{currentUser.name}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Organizer</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <nav className="sidebar-nav">
@@ -45,7 +64,7 @@ function Sidebar() {
           <Home size={20} />
           <span>Back to Main Page</span>
         </NavLink>
-        <button className="sidebar-link logout-btn">
+        <button onClick={handleLogout} className="sidebar-link logout-btn">
           <LogOut size={20} />
           <span>Logout</span>
         </button>
