@@ -1,18 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MapPin, Calendar, Users } from 'lucide-react';
-import { mockEvents } from '../data/mockData';
 
 function Explore() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategories, setActiveCategories] = useState([]);
+  
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceFilter, setPriceFilter] = useState('All');
 
-  const categories = ['All', 'Hackathon', 'Fest', 'Networking', 'Workshop'];
+  const [events, setEvents] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredEvents = mockEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || event.category === activeCategory;
-    return matchesSearch && matchesCategory;
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/events');
+        const data = await response.json();
+        
+        if (response.ok && data.events) {
+          const formatted = data.events.map(e => ({
+            ...e,
+            date: new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            venue: e.addressString || 'TBA',
+            spotsLeft: (e.totalCapacity || 100) - (e.ticketsSold || 0),
+          }));
+          setEvents(formatted);
+        }
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/categories');
+        const data = await response.json();
+        if (response.ok && data.categories) {
+          setCategoriesList(data.categories.map(c => c.name));
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    };
+    
+    fetchEvents();
+    fetchCategories();
+  }, []);
+
+  const toggleCategory = (cat) => {
+    setActiveCategories(prev => 
+      prev.includes(cat) 
+        ? prev.filter(c => c !== cat)
+        : [...prev, cat]
+    );
+  };
+  
+  const filteredEvents = events.filter(event => {
+    const term = searchTerm.toLowerCase();
+    const titleMatch = event.title?.toLowerCase().includes(term);
+    const venueMatch = event.venue?.toLowerCase().includes(term);
+    const tagsMatch = event.tags?.some(tag => tag.toLowerCase().includes(term));
+    const matchesSearch = titleMatch || venueMatch || tagsMatch;
+    
+    // Fallback classification if category isn't properly assigned
+    const fallbackCat = event.category || 'Fest';
+    const matchesCategory = activeCategories.length === 0 || activeCategories.includes(fallbackCat);
+    
+    // Price filter logic
+    const priceMatch = 
+      priceFilter === 'All' ? true :
+      priceFilter === 'Free' ? event.price === 0 :
+      event.price > 0;
+    
+    return matchesSearch && matchesCategory && priceMatch;
   });
 
   return (
@@ -33,19 +97,51 @@ function Explore() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="btn btn-secondary" style={{ display: 'flex', gap: '0.5rem' }}>
+        <button 
+          className={`btn ${showFilters ? 'btn-primary' : 'btn-secondary'}`} 
+          style={{ display: 'flex', gap: '0.5rem', transition: 'all 0.2s ease' }}
+          onClick={() => setShowFilters(!showFilters)}
+        >
           <Filter size={20} />
           Filters
         </button>
       </div>
 
+      {/* Expandable Filter Pane */}
+      {showFilters && (
+        <div style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', marginBottom: '2rem', animation: 'dropdownIn 0.2s ease-out' }}>
+          <h3 style={{ marginBottom: '1rem', fontSize: '1.05rem', color: 'var(--text-main)' }}>Pricing Preferences</h3>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            {['All', 'Free', 'Paid'].map(option => (
+              <label key={option} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                <input 
+                  type="radio" 
+                  name="priceFilter" 
+                  checked={priceFilter === option}
+                  onChange={() => setPriceFilter(option)}
+                  style={{ accentColor: 'var(--primary-color)', width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                />
+                {option === 'All' ? 'Any Price' : option}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-        {categories.map(cat => (
+        <button 
+          className={`btn ${activeCategories.length === 0 ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ borderRadius: 'var(--radius-full)', padding: '0.5rem 1rem', flexShrink: 0 }}
+          onClick={() => setActiveCategories([])}
+        >
+          All
+        </button>
+        {categoriesList.map(cat => (
           <button 
             key={cat} 
-            className={`btn ${activeCategory === cat ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ borderRadius: 'var(--radius-full)', padding: '0.5rem 1rem', flexShrink: 0 }}
-            onClick={() => setActiveCategory(cat)}
+            className={`btn ${activeCategories.includes(cat) ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ borderRadius: 'var(--radius-full)', padding: '0.5rem 1rem', flexShrink: 0, transition: 'background-color 0.2s ease' }}
+            onClick={() => toggleCategory(cat)}
           >
             {cat}
           </button>
@@ -59,7 +155,7 @@ function Explore() {
             <div className="card-image-wrap">
               <img src={event.image} alt={event.title} className="card-image" />
               <div className="card-tags">
-                <span className="tag tag-blur">{event.category}</span>
+                <span className="tag tag-blur">{event.category || 'Event'}</span>
               </div>
             </div>
             <div className="card-body">
@@ -69,7 +165,7 @@ function Explore() {
                 <span><MapPin size={14} /> {event.venue}</span>
               </div>
               <div className="card-footer">
-                <span className="price">{event.price === 0 ? 'Free' : `₹${event.price}`}</span>
+                <span className="price" style={{ fontSize: '1rem' }}>{event.price === 0 ? 'Free' : `₹${event.price}`}</span>
                 <span className="spots">
                   <Users size={14} />
                   {event.spotsLeft} spots left
@@ -78,8 +174,8 @@ function Explore() {
             </div>
           </Link>
         )) : (
-          <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
-            <p>No events found matching your criteria.</p>
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+            {loading ? <p>Loading fantastic events...</p> : <p>No events found matching your criteria.</p>}
           </div>
         )}
       </div>

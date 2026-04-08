@@ -19,9 +19,15 @@ export const AuthProvider = ({ children }) => {
   
   // Modal State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
+  const openOnboardingModal = () => setShowOnboarding(true);
+  const closeOnboardingModal = () => {
+    setShowOnboarding(false);
+    // Reload state or manually inject DB changes if necessary, but Context handles most
+  };
 
   const syncWithBackend = async (firebaseUser, role = 'attendee', name = null) => {
     try {
@@ -50,6 +56,9 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok) {
         setDbUser(data.user);
+        if (data.isNewAccount) {
+          setShowOnboarding(true);
+        }
       } else {
         console.error("Failed to sync user context with backend", data.error);
         throw new Error("Backend sync failed");
@@ -134,7 +143,10 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthModalOpen,
     openAuthModal,
-    closeAuthModal
+    closeAuthModal,
+    showOnboarding,
+    openOnboardingModal,
+    closeOnboardingModal
   };
 
   return (

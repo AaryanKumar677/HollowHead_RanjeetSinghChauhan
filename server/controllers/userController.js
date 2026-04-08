@@ -23,9 +23,9 @@ export const syncUser = async (req, res) => {
       };
       
       await userRef.set(newUser);
-      return res.status(201).json({ message: 'User created', user: newUser });
+      return res.status(201).json({ message: 'User created', user: newUser, isNewAccount: true });
     } else {
-      return res.status(200).json({ message: 'User exists', user: doc.data() });
+      return res.status(200).json({ message: 'User exists', user: doc.data(), isNewAccount: false });
     }
   } catch (error) {
     console.error("Error syncing user:", error);
@@ -70,11 +70,13 @@ export const updateRole = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, university } = req.body;
+    const { name, university, interests, hobbies } = req.body;
     
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (university !== undefined) updateData.university = university;
+    if (interests !== undefined && Array.isArray(interests)) updateData.interests = interests;
+    if (hobbies !== undefined) updateData.hobbies = hobbies;
     
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: "No valid fields to update" });

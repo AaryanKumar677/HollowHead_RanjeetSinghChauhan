@@ -121,10 +121,10 @@ function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
         
         {/* Metrics Progress Chart */}
-        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid #334155' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid #334155', minWidth: 0 }}>
           <h3 style={{ marginBottom: '1.5rem', color: '#f1f5f9' }}>Metrics Progress</h3>
           <div style={{ width: '100%', height: 350 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={animatedGoalsData} margin={{ top: 30, right: 30, left: 0, bottom: 10 }} barSize={50}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                 <XAxis dataKey="metric" stroke="#94a3b8" fontSize={13} tickLine={false} axisLine={false} dy={10} fontWeight={500} />
@@ -162,10 +162,10 @@ function Dashboard() {
         </div>
 
         {/* Revenue Trends Area Chart */}
-        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid #334155' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid #334155', minWidth: 0 }}>
           <h3 style={{ marginBottom: '1.5rem', color: '#f1f5f9' }}>Revenue Trends</h3>
           <div style={{ width: '100%', height: 350 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">

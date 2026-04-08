@@ -9,7 +9,16 @@ function Navbar() {
   const navigate = useNavigate();
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showHostBtn, setShowHostBtn] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleHostBtnState = (e) => {
+      setShowHostBtn(e.detail);
+    };
+    window.addEventListener('navHostBtnState', handleHostBtnState);
+    return () => window.removeEventListener('navHostBtnState', handleHostBtnState);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,6 +56,12 @@ function Navbar() {
             <Search size={20} />
             <span>Explore</span>
           </Link>
+          
+          {showHostBtn && (
+            <Link to={isOrganizer ? "/organizer/create" : "/pricing"} className="nav-item host-anim" style={{ background: 'var(--primary-color)', color: '#fff', padding: '0.4rem 1.2rem', borderRadius: 'var(--radius-full)', fontWeight: '600' }}>
+              Host Event
+            </Link>
+          )}
           
           {isOrganizer && (
             <Link to="/organizer/dashboard" className="nav-item org-portal-btn" style={{ background: 'var(--primary-color)', color: '#fff', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', fontWeight: '600' }}>

@@ -17,12 +17,14 @@ import Profile from './pages/Profile';
 import Pricing from './pages/Pricing';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthModal from './components/AuthModal';
+import OnboardingModal from './components/OnboardingModal';
 
 function App() {
   return (
     <div className="app-container">
       <ScrollToTop />
       <AuthModal />
+      <OnboardingModal />
       <Routes>
         {/* Client Flow */}
         <Route element={<ClientLayout />}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { X, Eye, EyeOff } from 'lucide-react';
 import './AuthModal.css';
@@ -16,6 +16,14 @@ function AuthModal() {
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    if (isAuthModalOpen) {
+      setLoading(false);
+      setError('');
+      setPassword('');
+    }
+  }, [isAuthModalOpen]);
+
   if (!isAuthModalOpen) return null;
 
   const handleGoogleAuth = async () => {
@@ -23,6 +31,7 @@ function AuthModal() {
     setLoading(true);
     try {
       await loginWithGoogle('attendee'); // Fast-track everyone to attendee
+      setLoading(false);
     } catch (err) {
       setError(err.message || 'Google Auth Failed');
       setLoading(false);
@@ -39,6 +48,7 @@ function AuthModal() {
       } else {
         await signupWithEmail(email, password, name, 'attendee'); // Enforce attendee role
       }
+      setLoading(false);
     } catch (err) {
       setError(err.message || 'Authentication Failed');
       setLoading(false);

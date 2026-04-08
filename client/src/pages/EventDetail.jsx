@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, Share2, Ticket, X, CheckCircle } from 'lucide-react';
 import { auth } from '../config/firebase';
-import { Calendar, MapPin, Users, Share2, Ticket } from 'lucide-react';
 
 function EventDetail() {
   const { id } = useParams();
@@ -10,7 +9,7 @@ function EventDetail() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingError, setBookingError] = useState(null);
@@ -20,7 +19,7 @@ function EventDetail() {
       try {
         const response = await fetch(`http://localhost:5000/api/events/${id}`);
         const data = await response.json();
-        
+
         if (response.ok && data.event) {
           const e = data.event;
           setEvent({
@@ -48,10 +47,10 @@ function EventDetail() {
 
   const handleCheckout = async () => {
     if (!auth.currentUser) {
-       alert("Please sign in first to reserve a spot.");
-       return;
+      alert("Please sign in first to reserve a spot.");
+      return;
     }
-    
+
     setIsProcessing(true);
     setBookingError(null);
     try {
@@ -67,18 +66,18 @@ function EventDetail() {
           paymentStatus: event.price === 0 ? 'free' : 'paid'
         })
       });
-      
+
       const data = await response.json();
       if (!response.ok) {
-         if (data.error === "ALREADY_BOOKED") {
-            throw new Error("You already have a valid ticket for this event!");
-         }
-         throw new Error(data.error || "Failed to purchase ticket");
+        if (data.error === "ALREADY_BOOKED") {
+          throw new Error("You already have a valid ticket for this event!");
+        }
+        throw new Error(data.error || "Failed to purchase ticket");
       }
 
       setShowModal(false);
       navigate(`/ticket/${data.ticketId}`);
-      
+
     } catch (err) {
       console.error(err);
       setBookingError(err.message || "Error reserving ticket. Please try again.");
@@ -104,7 +103,7 @@ function EventDetail() {
       </div>
 
       <div className="container" style={{ marginTop: '-4rem', position: 'relative', zIndex: 10, display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-        
+
         {/* Main Content */}
         <div style={{ flex: '1', minWidth: '300px', background: 'var(--bg-card)', padding: '2rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -114,7 +113,7 @@ function EventDetail() {
           </div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{event.title}</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', marginBottom: '2rem' }}>{event.description}</p>
-          
+
           <h3>About the Organizer</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem', padding: '1rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)' }}>
             <img src={event.organizer.avatar} alt="org" style={{ width: '50px', height: '50px', borderRadius: 'var(--radius-full)' }} />
@@ -129,7 +128,7 @@ function EventDetail() {
         <div style={{ width: '350px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ background: 'var(--bg-card)', padding: '2rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}>
             <h3 style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Event Details</h3>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                 <Calendar color="var(--primary-color)" />
@@ -160,7 +159,7 @@ function EventDetail() {
             <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
               <Ticket size={20} /> Reserve Spot
             </button>
-            
+
             <button className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
               <Share2 size={20} /> Share Event
             </button>
@@ -172,10 +171,10 @@ function EventDetail() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: '500px', padding: '2rem', boxShadow: 'var(--shadow-xl)', position: 'relative' }}>
             <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
-               <X size={24} />
+              <X size={24} />
             </button>
             <h2 style={{ marginBottom: '1.5rem' }}>Complete Registration</h2>
-            
+
             <div style={{ paddingBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
               <h3 style={{ marginBottom: '0.25rem' }}>{event.title}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{event.date} • {event.venue}</p>
@@ -198,8 +197,8 @@ function EventDetail() {
               </div>
             </div>
 
-            <button 
-              className="btn btn-primary" 
+            <button
+              className="btn btn-primary"
               style={{ width: '100%', justifyContent: 'center', padding: '1rem' }}
               onClick={handleCheckout}
               disabled={isProcessing}

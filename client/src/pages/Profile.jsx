@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { QRCodeSVG } from 'qrcode.react';
-import { Ticket, Calendar, MapPin, Loader2, ArrowRight, Edit3, Save, X } from 'lucide-react';
+import { Ticket, Calendar, MapPin, Loader2, ArrowRight, Edit3, Save, X, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Profile.css';
 
 function Profile() {
-  const { currentUser, dbUser } = useAuth();
+  const { currentUser, dbUser, openOnboardingModal } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -124,7 +124,10 @@ function Profile() {
       {/* Profile Header Block */}
       <div className="profile-header-card">
         <div className="profile-header-bg">
-           <button className="edit-profile-btn" onClick={() => setIsEditing(true)}>
+           <button className="header-action-btn secondary-action" onClick={openOnboardingModal}>
+             <Settings size={16} /> Preferences
+           </button>
+           <button className="header-action-btn primary-action" onClick={() => setIsEditing(true)}>
              <Edit3 size={16} /> Edit Profile
            </button>
         </div>
@@ -139,6 +142,21 @@ function Profile() {
              <h1>{dbUser.name || currentUser.displayName || 'Anonymous User'}</h1>
              <p className="profile-email">{currentUser.email}</p>
              {dbUser.university && <p className="profile-university"><MapPin size={16}/> {dbUser.university}</p>}
+             
+             {dbUser.interests && dbUser.interests.length > 0 && (
+               <div className="profile-interests-wrapper">
+                 {dbUser.interests.map(interest => (
+                   <span key={interest} className="interest-tag">
+                     {interest}
+                   </span>
+                 ))}
+               </div>
+             )}
+             {dbUser.hobbies && (
+                <p className="profile-hobbies">
+                  <strong>Hobbies:</strong> {dbUser.hobbies}
+                </p>
+             )}
           </div>
         </div>
       </div>

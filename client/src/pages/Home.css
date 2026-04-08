@@ -141,17 +141,30 @@
 
 .floating-card {
   position: absolute;
-  bottom: 40px;
-  right: -20px;
-  background: var(--bg-card);
+  bottom: 30px;
+  right: -30px;
+  background: rgba(15, 23, 42, 0.85); /* Dark translucent card to look good on the hero */
+  backdrop-filter: blur(8px);
   padding: 1rem;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   gap: 1rem;
   z-index: 3;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+}
+
+@keyframes tickerIn {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  5% { opacity: 1; transform: translateY(0) scale(1); }
+  95% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+}
+
+.ticker-anim {
+  animation: tickerIn 6s ease-in-out forwards;
 }
 
 .fl-avatar {
@@ -163,12 +176,12 @@
 .fl-text strong {
   display: block;
   font-size: 0.875rem;
-  color: var(--text-main);
+  color: #fff;
 }
 
 .fl-text span {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #cbd5e1;
 }
 
 @media (max-width: 992px) {
@@ -355,9 +368,16 @@
 
 /* Location Bar */
 .location-bar {
-  background-color: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent to let gradient show */
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1rem 0;
+  z-index: 10;
+  color: white;
 }
 
 .loc-container {
@@ -379,7 +399,7 @@
   align-items: center;
   gap: 0.75rem;
   font-weight: 500;
-  color: var(--text-main);
+  color: white;
 }
 
 .loc-actions {
